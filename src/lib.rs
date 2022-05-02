@@ -2,6 +2,7 @@ mod sail;
 mod phone;
 mod sonar;
 mod sensor;
+mod Steering_engine;
 
 #[cfg(test)]
 mod tests {
