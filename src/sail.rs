@@ -16,7 +16,7 @@ pub mod tracing_mod{
     use crate::sail::sail_base::{change_direction, sail_in_unsail_zone_prepare};
     use crate::sensor;
     use crate::sensor::wind;
-    pub fn trace_fish(period:i32){
+    pub fn trace_fish(){
     //     判断鱼群现在所处方位
         let fish_position = get_location();
     //     判断风向
@@ -44,9 +44,6 @@ pub mod sail_base{
     use std::num;
     use crate::Steering_engine;
     use crate::sensor;
-    pub fn sail(angle:i32, speed:i32){
-    //     向某方向，以某速度航行
-    }
     pub fn sail_with_angle_in_sail_zone(angle: i32){
         // 调整角度较小的时候
         if num::abs(angle-180) >= 90 {
@@ -73,11 +70,16 @@ pub mod sail_base{
             Steering_engine::turn_steering(0);
         }
     }
-    pub fn sail_in_unsail_zone(angle: i32){
+
+    pub fn change_direction(){
 
     }
 
-    pub fn change_direction(){
+    pub fn upward(){
+
+    }
+
+    pub fn downward(){
 
     }
 }
