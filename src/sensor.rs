@@ -18,3 +18,14 @@ pub mod wind{
     }
 }
 
+pub mod sailing_body{
+    pub enum BodyPosition {
+        Upward,
+        Downward
+    }
+    pub fn body_up_down() -> BodyPosition{
+        // 需添加上下浪代码
+        let position = BodyPosition::Downward;
+        position
+    }
+}

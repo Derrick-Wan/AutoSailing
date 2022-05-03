@@ -13,7 +13,7 @@ pub mod finding_mod{
 pub mod tracing_mod{
     use crate::sonar::trace_fish::get_location;
     use crate::sail::sail_base;
-    use crate::sail::sail_base::{change_direction, sail_in_unsail_zone_prepare};
+    use crate::sail::sail_base::{change_direction, sail_with_an_angle};
     use crate::sensor;
     use crate::sensor::wind;
     pub fn trace_fish(){
@@ -28,7 +28,7 @@ pub mod tracing_mod{
             sail_base::sail_with_angle_in_sail_zone(fish_position);
         }else {
             // 调整船身至与风的夹角为45度
-            sail_in_unsail_zone_prepare(wind_position);
+            sail_with_an_angle(wind_position, 45);
             let fish_new_position = get_location();
             if fish_new_position<=45&&(360-fish_new_position)<=45{
                 return
@@ -40,10 +40,27 @@ pub mod tracing_mod{
     }
 }
 
+pub mod safe_mode{
+    use crate::sail::sail_base::{downward, upward};
+    use crate::sensor::sailing_body::body_up_down;
+    use crate::sensor::sailing_body;
+    pub fn safe_mode(){
+        let position = body_up_down();
+        match position {
+            sailing_body::BodyPosition::Downward => downward(),
+            sailing_body::BodyPosition::Upward => upward()
+        }
+    }
+}
+
 pub mod sail_base{
     use std::num;
+    use std::thread::sleep;
+    use std::time::Duration;
     use crate::Steering_engine;
     use crate::sensor;
+    use crate::sensor::wind::get_wind;
+
     pub fn sail_with_angle_in_sail_zone(angle: i32){
         // 调整角度较小的时候
         if num::abs(angle-180) >= 90 {
@@ -53,19 +70,22 @@ pub mod sail_base{
         }
     }
 
-    pub fn sail_in_unsail_zone_prepare(wind_angle:i32){
+
+    pub fn sail_with_an_angle(wind_angle: i32, angle: i32){
         // 如果风是从右侧吹来
         if wind_angle<180{
             Steering_engine::turn_steering(30);
-            while num::abs(sensor::wind::get_wind()-45)>=5 {
-            //     要修改成并发操作
+            while num::abs(sensor::wind::get_wind()-angle)>=5 {
+                //     要修改成并发操作
+                sleep(Duration::from_secs(2));
             }
             Steering_engine::turn_steering(0);
         }else {
             // 如果风从左侧吹来
             Steering_engine::turn_steering(-30);
-            while num::abs(sensor::wind::get_wind()-(360-45)>=5) {
-            //     要修改成并发操作
+            while num::abs(sensor::wind::get_wind()-(360-angle)>=5) {
+                // 修改成并发操作
+                sleep(Duration::from_secs(2));
             }
             Steering_engine::turn_steering(0);
         }
@@ -76,10 +96,20 @@ pub mod sail_base{
     }
 
     pub fn upward(){
-
+        let wind_direction = get_wind();
+        if wind_direction <=90 || wind_direction>=(360-90){
+            sail_with_an_angle(wind_direction, 45);
+        }else {
+            sail_with_an_angle(wind_direction, 160);
+        }
     }
 
     pub fn downward(){
-
+        let wind_direction = get_wind();
+        if wind_direction <=90 || wind_direction>=(360-90){
+            sail_with_an_angle(wind_direction, 70);
+        }else {
+            sail_with_an_angle(wind_direction, 110);
+        }
     }
 }
